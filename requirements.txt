@@ -1,0 +1,6 @@
+python-dotenv
+smartapi-python
+pytz
+pyotp
+pandas
+streamlit
