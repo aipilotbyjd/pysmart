@@ -15,18 +15,20 @@ with st.spinner("Logging into Angel One SmartAPI..."):
     sc, auth_token, feed_token = get_smartconnect()
 
 
-# Load all F&O stocks from Angel One CSV
+# Load all F&O stocks from local CSV file
 @st.cache_data(ttl=3600)
 def load_fo_stocks():
-    url = "https://margincalculator.angelbroking.com/OpenAPI_File/files/OpenAPIScripMaster.csv"
-    content = requests.get(url).content
-    df = pd.read_csv(io.StringIO(content.decode("utf-8")))
-    df = df[(df["exch_seg"] == "NFO") & (df["name"] == "OPTSTK")]
+    # Load the local stocks CSV
+    df = pd.read_csv("stocks.csv")
+    # Rename column to lower case to match later references
+    df = df.rename(columns={"Symbol": "symbol"})
+    # Since the CSV doesn't provide tokens, use the symbol as token (update as needed)
+    df["token"] = df["symbol"]
     return df.drop_duplicates(subset="symbol")[["symbol", "token"]]
 
 
 fo_stocks = load_fo_stocks()
-st.write(f"Scanning top {len(fo_stocks)} F&O stocks")
+st.write(f"Scanning top {len(fo_stocks)} stocks from local CSV")
 
 breakouts = []
 
